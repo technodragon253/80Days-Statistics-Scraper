@@ -1,5 +1,5 @@
 import json
-from message_handler import retrieve_payments, Channel, retrieve_sabotages
+from message_handler import retrieve_payments, Channel, retrieve_sabotages, retrieve_game_dates
 
 import loading_animation
 l = loading_animation.loading_animation()
@@ -16,7 +16,7 @@ stallions_commands = Channel("614503418299547661", "Stallions Commands", "Crimso
 boars_general = Channel("614345791133188096", "Boars General", "Argent Boars")
 boars_commands = Channel("614350341344985098", "Boars Commands", "Argent Boars")
 
-
+dates = retrieve_game_dates(progress_anouncements)
 
 payments.append(retrieve_payments(wolves_commands))
 payments.append(retrieve_payments(wolves_general))
@@ -32,13 +32,16 @@ sabotages.append(retrieve_sabotages(stallions_general))
 sabotages.append(retrieve_sabotages(boars_commands))
 sabotages.append(retrieve_sabotages(boars_general))
 
-with open("sabotages.json", "w") as f:
-    results = [obj.to_dict() for obj in sabotages]
-    results.sort(key=lambda obj: obj["time"])
-    json.dump(results, f, indent=4)
-with open("payments.json", "w") as f:
-    results = [obj.to_dict() for obj in payments]
-    results.sort(key=lambda obj: obj["time"])
-    json.dump(results, f, indent=4)
 
-print("\r")
+with open("output.json", "w") as f:
+    s = [s.to_dict() for sabo in sabotages for s in sabo]
+    s.sort(key=lambda obj: obj["time"])
+    p = [p.to_dict() for payment in payments for p in payment]
+    p.sort(key=lambda obj: obj["time"])
+    out = {
+        "start_dates": dates,
+        "sabotages": s,
+        "payments": p
+    }
+
+    json.dump(out, f, indent=4)

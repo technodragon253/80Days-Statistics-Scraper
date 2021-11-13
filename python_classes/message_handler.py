@@ -6,12 +6,10 @@ from constants import *
 import json
 from typing import List
 from datetime import datetime
-
-debug = False
-
+import ratelimit_handler
+rh = ratelimit_handler.main()
 
 class main:
-    ratelimit_delay = initial_ratelimit_delay
     def datetime_to_snowflake(self, time):
         return (int(time.timestamp() * 1000) - discord_epoch) << 22
 
@@ -20,16 +18,15 @@ class main:
             raise Exception("Invalid Auth Key!")
         elif (response.status_code == 429): #429 means rate limiting
             limit = json.loads(response.text)["retry_after"] #Get the rate limit time
-            print(f"Rate limited. Sleeping {limit} seconds.")
-            time.sleep(limit) #Wait for the rate limit to be over.
-            self.ratelimit_delay += ratelimit_increment #Add to the delay to try to not get ratelimited again.
+            print(colors.red + f"Rate limited. Sleeping {limit} seconds." + colors.default)
+            time.sleep(limit)
+            rh.increase_ratelimit()
             return False
         else:
             return True
     
     def message_request(self, channel_id, args):
-        #print(f"https://discord.com/api/v9/channels/{channel_id}/messages{args}")
-        with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
         headers = { #Add the auth key to the headers. Kinda important.
@@ -38,7 +35,7 @@ class main:
         valid_response = False
         iterations = 0
         while valid_response != True:
-            time.sleep(self.ratelimit_delay) #StopRateLimitingMe
+            rh.ratelimit() #StopRateLimitingMe
             r = requests.get(f"https://discord.com/api/v9/channels/{channel_id}/messages{args}", headers=headers)
             valid_response = self.handle_response_errors(r)
             iterations += 1
@@ -47,7 +44,6 @@ class main:
         return r
 
     def message_request_between(self, server_id, start_time, end_time, channel_id, args = ""):
-        #print(f"https://discord.com/api/v9/channels/{channel_id}/messages{args}")
         with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
@@ -57,7 +53,7 @@ class main:
         valid_response = False
         iterations = 0
         while valid_response != True:
-            time.sleep(self.ratelimit_delay) #StopRateLimitingMe
+            rh.ratelimit() #StopRateLimitingMe
             r = requests.get(f"https://discord.com/api/v9/guilds/{server_id}/messages/search?min_id={start_time}&max_id={end_time}&channel_id={channel_id}{args}", headers=headers)
             valid_response = self.handle_response_errors(r)
             iterations += 1
@@ -92,7 +88,7 @@ class main:
 
     def retrive_game_endpoints(self):
         out = []
-        tmp = None
+        end = None
 
         i = 0
         end_reached = False
@@ -108,10 +104,13 @@ class main:
             for value in content:
                 if value["author"]["username"] == "80Days":
                     if (value["content"].find("Welcome to day **1**") != -1):
-                        out.append({"start_time": datetime.fromisoformat(value["timestamp"]), "end_time": tmp})
-                        tmp = ""
+                        if end != None:
+                            out.append({"start_time": datetime.fromisoformat(value["timestamp"]), "end_time": end})
+                            end = None
+                        else:
+                            print("Found game in progress.")
                     elif (value["content"].find("The game has ended!") != -1):
-                        tmp = datetime.fromisoformat(value["timestamp"])
+                        end = datetime.fromisoformat(value["timestamp"])
 
                 last_message = value["id"] #Set the last message to be able to find the next block of messsages.
                 if (int(last_message) < cut_off_id):
@@ -164,12 +163,13 @@ class main:
                         place = 2
                     elif(message["content"].find("In first place") != -1):
                         place = 1
-                    if message["content"].split()[7] == "Argent":
-                        boars_place = place
-                    elif message["content"].split()[7] == "Azure":
-                        wolves_place = place
-                    elif message["content"].split()[7] == "Crimson":
-                        stallions_place = place
+                    if place != 0:
+                        if message["content"].split()[7] == "Argent":
+                            boars_place = place
+                        elif message["content"].split()[7] == "Azure":
+                            wolves_place = place
+                        elif message["content"].split()[7] == "Crimson":
+                            stallions_place = place
             total -= 25
             offset += 25
             i += 1
@@ -215,13 +215,3 @@ class main:
                     i += 1
         return game
         
-
-m = main()
-t = m.retrive_game_endpoints()
-
-out = m.retrive_game(t[0]["start_time"], t[0]["end_time"])
-
-with open("test.json", "w") as f:
-    json.dump(out.to_dict(), f, indent=4)
-
-#print(f"Final Request Delay: {m.ratelimit_delay}")

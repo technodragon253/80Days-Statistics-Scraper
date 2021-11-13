@@ -1,3 +1,7 @@
 auth_key.txt
 .vscode/launch.json
+.gitignore
 
+80DaysStatisticsScraper.code-workspace
+__pycache__/
+python_classes/__pycache__/

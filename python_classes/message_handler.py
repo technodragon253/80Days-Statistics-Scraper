@@ -44,7 +44,7 @@ class main:
         return r
 
     def message_request_between(self, server_id, start_time, end_time, channel_id, args = ""):
-        with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
         headers = { #Add the auth key to the headers. Kinda important.
@@ -60,8 +60,26 @@ class main:
             if iterations > max_retries:
                 raise Exception("Max Retries Reached!")
         return r
+    
+    def account_request(self, account_id):
+        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+            key = f.readline()
 
-    def parse_payments(self, message, team):
+        headers = { #Add the auth key to the headers. Kinda important.
+            'authorization': key 
+        }
+        valid_response = False
+        iterations = 0
+        while valid_response != True:
+            rh.ratelimit() #StopRateLimitingMe
+            r = requests.get(f"https://discord.com/api/v9/users/{account_id}/profile?with_mutual_guilds=false", headers=headers)
+            valid_response = self.handle_response_errors(r)
+            iterations += 1
+            if iterations > max_retries:
+                raise Exception("Max Retries Reached!")
+        return r
+
+    def parse_payment(self, message, team):
         if message["author"]["username"] == "80Days":
             if (message["content"].find("has paid") != -1):
                 if message["content"].find("sabotage") != -1:
@@ -74,7 +92,7 @@ class main:
                     payment = Payment(datetime.fromisoformat(message["timestamp"]), id, amount, team, v[3])
                     return payment
 
-    def parse_sabotages(self, message):
+    def parse_sabotage(self, message):
         if message["author"]["username"] == "80Days":
             if (message["content"].find("has paid") != -1):
                 if message["content"].find("sabotage") != -1:                    
@@ -84,7 +102,6 @@ class main:
                     id = (message["content"].split()[0]).translate(str.maketrans('', '', '<@!>')) #Remove the random other characters from the player id. Thanks StackOverFlow: https://stackoverflow.com/questions/3939361/remove-specific-characters-from-a-string-in-python#3939381
                     sabo = Sabotage(datetime.fromisoformat(message["timestamp"]), id, amount, v[3][:-1], v[5])
                     return sabo
-
 
     def retrive_game_endpoints(self):
         out = []
@@ -109,27 +126,13 @@ class main:
                             end = None
                         else:
                             print("Found game in progress.")
-                    elif (value["content"].find("The game has ended!") != -1):
+                    elif (value["content"].find("Thank you all for playing!") != -1):
                         end = datetime.fromisoformat(value["timestamp"])
 
                 last_message = value["id"] #Set the last message to be able to find the next block of messsages.
                 if (int(last_message) < cut_off_id):
                     end_reached = True
                     
-        return out
-
-        #out = []
-        #if (starts_ends["starts"] > starts_ends["ends"]):
-        #    print("There is a game currently in progress. Results may not be accurate!")
-        #    starts_ends["starts"].pop(0)
-        #i = 0
-        #print(starts_ends["starts"].__len__())
-        #print(starts_ends["ends"].__len__())
-        #while i < starts_ends["starts"].__len__():
-        #    out.append({"start_time": starts_ends["starts"][i], "end_time": starts_ends["ends"][i]})
-        #    i += 1
-        #    print(i)
-
         return out
 
     def retrive_game(self, start_date: datetime, end_date: datetime):
@@ -157,19 +160,45 @@ class main:
             for messages in r["messages"]:
                 for message in messages:
                     place = 0
-                    if message["content"].find("In third place") != -1:
+                    if message["content"].find("In third place,") != -1:
                         place = 3
-                    elif(message["content"].find("In second place") != -1):
-                        place = 2
-                    elif(message["content"].find("In first place") != -1):
-                        place = 1
-                    if place != 0:
                         if message["content"].split()[7] == "Argent":
                             boars_place = place
+                            print("Boar's place found!")
                         elif message["content"].split()[7] == "Azure":
                             wolves_place = place
+                            print("Wolve's place found!")
                         elif message["content"].split()[7] == "Crimson":
                             stallions_place = place
+                            print("Stallion's place found!")
+                        else:
+                            print("No podium places found!")
+                    elif(message["content"].find("In second place,") != -1):
+                        place = 2
+                        if message["content"].split()[7] == "Argent":
+                            boars_place = place
+                            print("Boar's place found!")
+                        elif message["content"].split()[7] == "Azure":
+                            wolves_place = place
+                            print("Wolve's place found!")
+                        elif message["content"].split()[7] == "Crimson":
+                            stallions_place = place
+                            print("Stallion's place found!")
+                        else:
+                            print("No podium places found!")
+                    elif(message["content"].find("Finally, in first place,") != -1):
+                        place = 1
+                        if message["content"].split()[5] == "Argent":
+                            boars_place = place
+                            print("Boar's place found!")
+                        elif message["content"].split()[5] == "Azure":
+                            wolves_place = place
+                            print("Wolve's place found!")
+                        elif message["content"].split()[5] == "Crimson":
+                            stallions_place = place
+                            print("Stallion's place found!")
+                        else:
+                            print("No podium places found!")
             total -= 25
             offset += 25
             i += 1
@@ -179,11 +208,11 @@ class main:
             game.teams.append(Team(idx + 1, None, [], [], []))
 
             #Depending on which team we are interating over, we set the place. 1 for first, 2 for secound, etc.
-            if idx == 0:
+            if key == 1:
                 game.teams[idx].place = boars_place
-            elif idx == 1:
+            elif key == 2:
                 game.teams[idx].place = wolves_place
-            elif idx == 2:
+            elif key == 3:
                 game.teams[idx].place = stallions_place
 
             #Iterating over each channel belonging to a team.
@@ -200,18 +229,19 @@ class main:
                         r = json.loads(self.message_request_between(server_id, start, end, channel.id, f"&offset={offset}").text)
                     for messages in r["messages"]:
                         for message in messages:
-                            payment = self.parse_payments(message, idx + 1)
-                            sabotage = self.parse_sabotages(message)
+                            payment = self.parse_payment(message, idx + 1)
+                            sabotage = self.parse_sabotage(message)
                             if (payment != None):
                                 game.teams[idx].payments.append(payment)
-                                if not game.teams[idx].players.__contains__(Player(payment.player_id, "")):
-                                    game.teams[idx].players.append(Player(payment.player_id, ""))
+                                if not game.teams[idx].players.__contains__(Player(payment.player_id, message["mentions"][0]["username"])):
+                                    game.teams[idx].players.append(Player(payment.player_id, message["mentions"][0]["username"]))
                             if (sabotage != None):
                                 game.teams[idx].sabotages.append(sabotage)
-                                if not game.teams[idx].players.__contains__(sabotage.player_id):
-                                    game.teams[idx].players.append(Player(sabotage.player_id, ""))
+                                if not game.teams[idx].players.__contains__(Player(sabotage.player_id, message["mentions"][0]["username"])):
+                                    game.teams[idx].players.append(Player(sabotage.player_id, message["mentions"][0]["username"]))
                     total -= 25
                     offset += 25
                     i += 1
+
         return game
         

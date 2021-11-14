@@ -27,10 +27,7 @@ try:
                 if endpoint["start_time"].date() == date["start_time"].date(): #Round to the nearest day then check the dates.
                     final_endpoints.pop(i)
                     i -= 1 #Take away one from i because the list is now shorter.
-                    #print(colors.green + f"""Endpoint: {endpoint["start_time"].date()} Date to skip: {date["start_time"].date()}""" + colors.default)
                     break
-                #else:
-                #    print(colors.red + f"""Endpoint: {endpoint["start_time"].date()} Date to skip: {date["start_time"].date()}""" + colors.default)     
             i += 1
     #Having "games found" when there was only one game found annoyed me.
     s = "s"

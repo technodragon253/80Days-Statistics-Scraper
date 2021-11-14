@@ -60,7 +60,7 @@ class Team:
         sabotages = []
         for sabotage in self.sabotages:
             sabotages.append(sabotage.to_dict())
-        return {"id": self.id, "players": players, "payments": payments, "sabotages": sabotages}
+        return {"id": self.id, "place": self.place, "players": players, "payments": payments, "sabotages": sabotages}
 
 
 @dataclass

@@ -16,6 +16,6 @@ To get your auth key follow this tutorial: https://www.youtube.com/watch?v=YEgFv
 
 # Usage
 
-Run "main.py" to download all games. By default it will only download any missing games in output.json. For now to download all games, not just the missing ones, you need to delete "output.json". 
+Run "main.py" to download all games. By default it will only download any missing games in output.json. For now to redownload all games, not just the missing ones, you need to delete "output.json". 
 
-Currently there is no way of automatically gathering statistics. This will be changed shortly
+Currently there is no way of automatically gathering statistics. This will be changed shortly.

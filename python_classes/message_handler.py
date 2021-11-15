@@ -22,6 +22,9 @@ class main:
             time.sleep(limit)
             rh.increase_ratelimit()
             return False
+        elif response.status_code != 200:
+            print(response.text)
+            return False
         else:
             return True
     
@@ -164,41 +167,26 @@ class main:
                         place = 3
                         if message["content"].split()[7] == "Argent":
                             boars_place = place
-                            print("Boar's place found!")
                         elif message["content"].split()[7] == "Azure":
                             wolves_place = place
-                            print("Wolve's place found!")
                         elif message["content"].split()[7] == "Crimson":
                             stallions_place = place
-                            print("Stallion's place found!")
-                        else:
-                            print("No podium places found!")
                     elif(message["content"].find("In second place,") != -1):
                         place = 2
                         if message["content"].split()[7] == "Argent":
                             boars_place = place
-                            print("Boar's place found!")
                         elif message["content"].split()[7] == "Azure":
                             wolves_place = place
-                            print("Wolve's place found!")
                         elif message["content"].split()[7] == "Crimson":
                             stallions_place = place
-                            print("Stallion's place found!")
-                        else:
-                            print("No podium places found!")
                     elif(message["content"].find("Finally, in first place,") != -1):
                         place = 1
                         if message["content"].split()[5] == "Argent":
                             boars_place = place
-                            print("Boar's place found!")
                         elif message["content"].split()[5] == "Azure":
                             wolves_place = place
-                            print("Wolve's place found!")
                         elif message["content"].split()[5] == "Crimson":
                             stallions_place = place
-                            print("Stallion's place found!")
-                        else:
-                            print("No podium places found!")
             total -= 25
             offset += 25
             i += 1

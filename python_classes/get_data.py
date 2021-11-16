@@ -47,6 +47,7 @@ for i, final_endpoint in enumerate(final_endpoints):
         print(f"{i + 1} out of {len(final_endpoints)} games to download have been downloaded.")
 
     with open("../output.json", "w") as f:
+        output.sort(key=lambda item: item.get("start_time")) #Sort all the games before saving them. Alphabetical sorting puts them first to last.
         json.dump(output, f, indent=4)
     print("output.json updated.")
 

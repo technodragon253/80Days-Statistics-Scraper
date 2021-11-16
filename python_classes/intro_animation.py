@@ -1,5 +1,4 @@
 from constants import colors
-import sys
 import time
 from os import name, system
 

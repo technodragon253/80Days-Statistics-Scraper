@@ -1,5 +1,10 @@
 import json
+from time import time
 from constants import colors
+from os import name, system
+
+def s(i):
+    return str("s" * min(i - 1, 1))
 
 try:
     with open("../output.json", "r") as f:
@@ -25,6 +30,7 @@ What statistic would you like to get?
         i = input("""
 Enter the player id of the player you want to look up.
 """)
+        system('cls' if name == 'nt' else 'clear')
         #Find the games whrere the player did things.
         games_to_scan = []
         players_sabotages = []
@@ -34,7 +40,11 @@ Enter the player id of the player you want to look up.
                 for player in team["players"]:
                     if player["id"] == i:
                         games_to_scan.append(game)
-        #Find all sabotages by the player.
+        if games_to_scan == []:
+            raise Exception("Player did nothing!")
+
+        
+        #Find all sabotages/payments by the player.
         for game in games_to_scan:
             for team in game["teams"]:
                 for sabotage in team["sabotages"]:
@@ -68,19 +78,19 @@ Enter the player id of the player you want to look up.
                 often_locations[payment["location"]] += 1
             else:
                 often_locations[payment["location"]] =  1
-        average_sabotage = int(total_payed / number_of_payments)
+        average_payment = int(total_payed / number_of_payments)
         most_payed_location = max(payed_locations, key=payed_locations.get)
         most_often_location = max(often_locations, key=often_locations.get)
 
         print(f"""{colors.dark_green}
 Payment stats:
-{colors.green}{total_payed} lifetime coins payed.
-{number_of_payments} indivival payments.
-Biggest payment: {max_payment} coins.
-Smallest payment: {min_payment} coins.
-Average payment: {average_sabotage} coins.
-Lifetime highest payed for location: {most_payed_location} with {payed_locations[most_payed_location]} coins payed!
-Lifetime most often payed for location: {most_often_location} traveled to {often_locations[most_often_location]} times!
+{colors.green}{total_payed} lifetime coin{s(total_payed)} payed.
+{number_of_payments} indivival payment{s(number_of_payments)}.
+Biggest payment: {max_payment} coin{s(max_payment)}.
+Smallest payment: {min_payment} coin{s(min_payment)}.
+Average payment: {average_payment} coin{s(average_payment)}.
+Lifetime highest payed for location: {most_payed_location} with {payed_locations[most_payed_location]} coin{s(payed_locations[most_payed_location])} payed!
+Lifetime most often payed for location: {most_often_location} traveled to {often_locations[most_often_location]} time{s(often_locations[most_often_location])}!
 {colors.default}""")
 
         #Find sabotage stats.
@@ -88,7 +98,7 @@ Lifetime most often payed for location: {most_often_location} traveled to {often
         number_of_sabotages = 0
         max_sabotage = 0
         min_sabotage = 100000 #Need to set it to an obsured number so the min function works.
-        average_sabotage = 0
+        average_payment = 0
         sabotaged_locations = {}
         most_sabotaged_location = ""
         highest_locations = {}
@@ -107,7 +117,7 @@ Lifetime most often payed for location: {most_often_location} traveled to {often
                 sabotaged_locations[sabotage["location"]] += 1
             else:
                 sabotaged_locations[sabotage["location"]] =  1
-        average_sabotage = int(total_sabotaged / number_of_sabotages)
+        average_payment = int(total_sabotaged / number_of_sabotages)
         most_sabotaged_location = max(sabotaged_locations, key=sabotaged_locations.get)
         highest_sabotaged_location = max(sabotaged_locations, key=sabotaged_locations.get)
 
@@ -115,12 +125,48 @@ Lifetime most often payed for location: {most_often_location} traveled to {often
 Sabotages stats:
 {colors.red}{total_sabotaged} lifetime coins sabotaged.
 {number_of_sabotages} indivival sabotages.
-Biggest sabotage: {max_sabotage} coins.
-Smallest sabotage: {min_sabotage} coins.
-Average sabotage: {average_sabotage} coins.
-Lifetime highest sabotaged location: {highest_sabotaged_location} with {highest_locations[highest_sabotaged_location]} coins payed!
-Lifetime most often sabotaged location: {most_sabotaged_location} traveled to {sabotaged_locations[most_sabotaged_location]} times!
+Biggest sabotage: {max_sabotage} coin{s(max_sabotage)}.
+Smallest sabotage: {min_sabotage} coin{s(min_sabotage)}.
+Average sabotage: {average_payment} coin{s(average_payment)}.
+Lifetime highest total sabotaged location: {highest_sabotaged_location} with {highest_locations[highest_sabotaged_location]} coin{s(highest_locations[highest_sabotaged_location])} sabotaged!
+Lifetime most often sabotaged location: {most_sabotaged_location} sabotaged {sabotaged_locations[most_sabotaged_location]} time{s(sabotaged_locations[most_sabotaged_location])}!
 {colors.default}""")
 
-        #Find win stats
+        #Find win and team stats
+        total_wins = 0
+        total_games = 0
+        win_rate = 0
+        times_boars = 0
+        times_wolves = 0
+        times_stallions = 0
+
+        for game in games_to_scan:
+            for iter, team in enumerate(game["teams"]):
+                for player in team["players"]:
+                    if player["id"] == i:
+                        total_games += 1
+                        if team["place"] == 1:
+                            total_wins += 1
+                        if iter == 0:
+                            times_boars += 1
+                        elif iter == 1:
+                            times_wolves += 1
+                        elif iter == 2:
+                            times_stallions += 1
         
+        win_rate = (total_wins / total_games) * 100
+
+        print(f"""{colors.dark_blue}
+Win stats:
+{colors.blue}{total_wins} total win{s(total_wins)}.
+{total_games} total game{s(total_games)}.
+{win_rate}% win rate.
+
+{colors.dark_yellow}
+Team stats:
+{colors.yellow}Player was on the {colors.default}Argent Boars{colors.yellow} {times_boars} time{s(times_boars)}!
+Player was on the {colors.cyan}Azure Wolves{colors.yellow} {times_wolves} time{s(times_wolves)}!
+Player was on the {colors.red}Crimson Stallions{colors.yellow} {times_stallions} time{s(times_stallions)}!
+{colors.default}""")
+    elif i == 2:
+        print("This feature is not yet implemented.")

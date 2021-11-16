@@ -4,7 +4,10 @@ from constants import colors
 from os import name, system
 
 def s(i):
-    return str("s" * min(i - 1, 1))
+    if i != 1:
+        return "s"
+    else:
+        return ""
 
 try:
     with open("../output.json", "r") as f:
@@ -28,22 +31,37 @@ What statistic would you like to get?
 """)
     if i == "1":
         i = input("""
-Enter the player id of the player you want to look up.
+Enter the player id or name of the player you want to look up.
 """)
         system('cls' if name == 'nt' else 'clear')
         #Find the games whrere the player did things.
+        player_id = ""
+        player_name = ""
         games_to_scan = []
         players_sabotages = []
         players_payments = []
         for game in data:
             for team in game["teams"]:
                 for player in team["players"]:
-                    if player["id"] == i:
+                    if player_id != "":
+                        if player["id"] == player_id:
+                            games_to_scan.append(game)
+                    elif player["id"] == i:
                         games_to_scan.append(game)
+                        player_id = player["id"]
+                        player_name = player["name"]
+                    elif player["name"].lower() == i.lower(): #If the name of a player was entered change 'i' to be the player id.
+                        i = player["id"]
+                        games_to_scan.append(game)
+                        player_id = player["id"]
+                        player_name = player["name"]
         if games_to_scan == []:
             raise Exception("Player did nothing!")
 
-        
+        print(f"""{colors.purple}
+Statistics for {player_name} with id of {player_id}:
+        {colors.default}""")
+
         #Find all sabotages/payments by the player.
         for game in games_to_scan:
             for team in game["teams"]:
@@ -123,8 +141,8 @@ Lifetime most often payed for location: {most_often_location} traveled to {often
 
         print(f"""{colors.dark_red}
 Sabotages stats:
-{colors.red}{total_sabotaged} lifetime coins sabotaged.
-{number_of_sabotages} indivival sabotages.
+{colors.red}{total_sabotaged} lifetime coin{s(total_sabotaged)} sabotaged.
+{number_of_sabotages} indivival sabotages{s(number_of_sabotages)}.
 Biggest sabotage: {max_sabotage} coin{s(max_sabotage)}.
 Smallest sabotage: {min_sabotage} coin{s(min_sabotage)}.
 Average sabotage: {average_payment} coin{s(average_payment)}.

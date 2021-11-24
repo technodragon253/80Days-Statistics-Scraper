@@ -14,8 +14,6 @@ if i == "1":
     import python_classes.get_data
 elif i == "2":
     import python_classes.get_statistics
-else:
-    quit()
 
 
 input("\nPress Enter to Exit...")

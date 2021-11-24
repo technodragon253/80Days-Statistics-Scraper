@@ -42,10 +42,10 @@ with open("output.json", "r") as f:
     data = data_types.from_json(json.loads(f.read()))
 i = input(f"""
 What statistic would you like to get? 
-{colors.green}(Press 1 for player look up){colors.default}
-{colors.green}(Press 2 for team look up){colors.default}
-{colors.green}(Press 3 for hall of fame){colors.default}
-{colors.green}(Any other key to exit){colors.default}
+{colors.green}(Press '1' and 'Enter' for player look up){colors.default}
+{colors.green}(Press '2' and 'Enter' for team look up){colors.default}
+{colors.green}(Press '3' and 'Enter' for hall of fame){colors.default}
+{colors.green}(Press 'Enter' to exit){colors.default}
 """)
 #Get the player lookup table
 for game in data:

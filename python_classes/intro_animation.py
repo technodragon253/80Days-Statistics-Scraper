@@ -1,4 +1,4 @@
-from constants import colors
+from python_classes.constants import colors
 import time
 from os import name, system
 

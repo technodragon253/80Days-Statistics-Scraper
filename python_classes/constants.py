@@ -1,5 +1,4 @@
 from os import name
-import colorama
 
 class colors:
     if name == "nt":
@@ -69,7 +68,7 @@ class colors:
         print(colors.gray + "gray" + colors.default)
         print(colors.default + "default" + colors.default)
 
-from data_types import Channel
+from python_classes.data_types import Channel
 
 server_id = "614335416178442242"
 progress_anouncements = Channel("614336214786375682", "Progress Anouncements", "Anouncements")
@@ -80,6 +79,8 @@ wolves_commands = Channel("614350640264511508", "Wolves Commands", "Azure Wolves
 stallions_general = Channel("614345873463443457", "Stallions General", "Crimson Stallions")
 stallions_commands = Channel("614503418299547661", "Stallions Commands", "Crimson Stallions")
 all_player_channels = {1:[boars_general, boars_commands], 2:[wolves_general, wolves_commands], 3:[stallions_general, stallions_commands]}
+
+team_lookup_table = {1:"Argent Boars", 2:"Azure Wolves", 3: "Crimson Stallions"}
 
 discord_epoch = 1420070400000
 

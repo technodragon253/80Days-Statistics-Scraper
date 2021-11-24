@@ -1,5 +1,5 @@
 import time
-import constants
+import python_classes.constants as constants
 
 class main():
     def __init__(self):

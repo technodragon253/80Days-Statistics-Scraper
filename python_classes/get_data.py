@@ -1,10 +1,10 @@
 import json
-import message_handler
-from constants import *
+import python_classes.message_handler as message_handler
+from python_classes.constants import *
 mh = message_handler.main()
 from datetime import datetime
 
-import loading_animation
+import python_classes.loading_animation as loading_animation
 l = loading_animation.loading_animation()
 l.start()  
 
@@ -15,7 +15,7 @@ print("Game endpoints retrieved.")
 
 final_endpoints = endpoints.copy()
 try:
-    with open("../output.json", "r") as f:
+    with open("output.json", "r") as f:
         data = json.loads(f.read())
         game_dates_to_skip = []
         for game in data:
@@ -46,7 +46,7 @@ for i, final_endpoint in enumerate(final_endpoints):
     else:
         print(f"{i + 1} out of {len(final_endpoints)} games to download have been downloaded.")
 
-    with open("../output.json", "w") as f:
+    with open("output.json", "w") as f:
         output.sort(key=lambda item: item.get("start_time")) #Sort all the games before saving them. Alphabetical sorting puts them first to last.
         json.dump(output, f, indent=4)
     print("output.json updated.")

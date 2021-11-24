@@ -1,12 +1,12 @@
 import time
 import requests
 from requests.models import Response
-from data_types import *
-from constants import *
+from python_classes.data_types import *
+from python_classes.constants import *
 import json
 from typing import List
 from datetime import datetime
-import ratelimit_handler
+import python_classes.ratelimit_handler as ratelimit_handler
 rh = ratelimit_handler.main()
 
 class main:
@@ -29,7 +29,7 @@ class main:
             return True
     
     def message_request(self, channel_id, args):
-        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+        with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
         headers = { #Add the auth key to the headers. Kinda important.
@@ -47,7 +47,7 @@ class main:
         return r
 
     def message_request_between(self, server_id, start_time, end_time, channel_id, args = ""):
-        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+        with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
         headers = { #Add the auth key to the headers. Kinda important.
@@ -65,7 +65,7 @@ class main:
         return r
     
     def account_request(self, account_id):
-        with open('../auth_key.txt') as f: #Get the auth key from "auth_key.txt".
+        with open('auth_key.txt') as f: #Get the auth key from "auth_key.txt".
             key = f.readline()
 
         headers = { #Add the auth key to the headers. Kinda important.

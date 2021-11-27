@@ -1,6 +1,3 @@
-#import os
-#os.chdir("python_classes")
-
 import python_classes.intro_animation
 
 from python_classes.constants import colors

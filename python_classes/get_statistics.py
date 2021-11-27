@@ -49,11 +49,11 @@ What statistic would you like to get?
 """)
 #Get the player lookup table
 for game in data:
-        for team in game.teams:
-            for player in team.players:
-                if player.id != "" or player.id != None:
-                    if player.name != "" or player.name != None:
-                        player_lookup_table[player.id] = player.name
+    for team in game.teams:
+        for player in team.players:
+            if player.id != "" or player.id != None:
+                if player.name != "" or player.name != None:
+                    player_lookup_table[player.id] = player.name
 
 #Further user prompting
 if i == "1":
@@ -204,7 +204,7 @@ Enter the player id or name of the player you want to look up.
 
     #Print way too many statistics!
     print(f"""{colors.purple}
-Statistics for {player_name} with id of {player_id}:
+Statistics for "{player_name}" with id of {player_id}:
 
 {colors.dark_green}
 Payment stats:
@@ -230,7 +230,7 @@ Lifetime most often sabotaged location: {most_sabotaged_location} sabotaged {sab
 Win stats:
 {colors.yellow}{total_wins} total win{s(total_wins)}.
 {total_games} total game{s(total_games)}.
-{win_rate}% win rate.
+{round(win_rate, 2)}% win rate.
 
 {colors.dark_blue}
 Team stats:
@@ -292,14 +292,45 @@ elif i == "3":
     for sabotage in all_sabotages:
         if max(highest_lifetime_sabotage.amount, sabotage.amount) == sabotage.amount:
             highest_lifetime_sabotage = sabotage
+    
+    #Get win stats.
+    players_wins = {}
+    most_winningest_player = {"id": None, "wins": 0}
+    most_winningest_player_by_percentage = {"id": None, "win_rate": 0}
+    for game in data:
+        for team in game.teams:
+            for player in team.players:
+                if player.id in players_wins:
+                    if team.place == 1:
+                        players_wins[player.id]["wins"] += 1
+                    players_wins[player.id]["games"] += 1
+                else:
+                    if team.place == 1:
+                        players_wins[player.id] = {"wins": 1, "games": 1}
+                    else:
+                        players_wins[player.id] = {"wins": 0, "games": 1}
+                players_wins[player.id]["id"] = player.id
+    for player in players_wins:
+        if max(most_winningest_player["wins"], players_wins[player]["wins"]) == players_wins[player]["wins"]:
+            most_winningest_player = players_wins[player]
+        player_win_rate = players_wins[player]["wins"] / players_wins[player]["games"]
+        if players_wins[player]["wins"] >= 3:
+            if max(most_winningest_player_by_percentage["win_rate"], player_win_rate) == player_win_rate:
+                most_winningest_player_by_percentage["id"] = players_wins[player]["id"]
+                most_winningest_player_by_percentage["win_rate"] = player_win_rate
+                
 
     print(f"""{colors.dark_green}
 Payment Hall of Fame:
-{colors.green}Largest payment: {highest_payment.amount} coin{s(highest_payment.amount)} by {p(highest_payment.player_id)} toward {highest_payment.location} at {highest_payment.time.strftime("%H:%M %b %d %Y")}!{colors.default}
-{colors.green}Highest lifetime coins payed: {p(highest_lifetime_payment.player_id)} with {highest_lifetime_payment.amount} lifetime coin{s(highest_lifetime_payment.amount)} payed!{colors.default}
+{colors.green}Largest payment: {highest_payment.amount} coin{s(highest_payment.amount)} by "{p(highest_payment.player_id)}" toward {highest_payment.location} at {highest_payment.time.strftime("%H:%M %b %d %Y")}!{colors.default}
+{colors.green}Highest lifetime coins payed: "{p(highest_lifetime_payment.player_id)}" with {highest_lifetime_payment.amount} lifetime coin{s(highest_lifetime_payment.amount)} payed!{colors.default}
 
 {colors.dark_red}
 Sabotage Hall of Fame:
-{colors.red}Largest sabotage: {highest_sabotage.amount} coin{s(highest_sabotage.amount)} by {p(highest_sabotage.player_id)} at {highest_sabotage.time.strftime("%H:%M %b %d %Y")} against {t(highest_sabotage.against)} trying to travel to {highest_sabotage.location}!{colors.default}
-{colors.red}Highest lifetime coins sabotaged: {p(highest_lifetime_payment.player_id)} with {highest_lifetime_sabotage.amount} lifetime coin{s(highest_lifetime_sabotage.amount)} sabotaged!{colors.default}
+{colors.red}Largest sabotage: {highest_sabotage.amount} coin{s(highest_sabotage.amount)} by "{p(highest_sabotage.player_id)}" at {highest_sabotage.time.strftime("%H:%M %b %d %Y")} against {t(highest_sabotage.against)} trying to travel to {highest_sabotage.location}!{colors.default}
+{colors.red}Highest lifetime coins sabotaged: "{p(highest_lifetime_payment.player_id)}" with {highest_lifetime_sabotage.amount} lifetime coin{s(highest_lifetime_sabotage.amount)} sabotaged!{colors.default}
+
+{colors.dark_yellow}
+{colors.yellow}Most wins: "{p(most_winningest_player["id"])}" with {most_winningest_player["wins"]} win{s(most_winningest_player["wins"])}!{colors.default}
+{colors.yellow}Highest win percentage by player with more that three wins: "{p(most_winningest_player_by_percentage["id"])}" with a {round(most_winningest_player_by_percentage["win_rate"] * 100, 2)}% win rate!{colors.default}
 """)

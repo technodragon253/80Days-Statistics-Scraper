@@ -105,6 +105,7 @@ black_cats = """
 
 """
 
+
 def animate_logo(logo: str, type: int):
     out = ""
     for i, c in enumerate(logo):
@@ -133,15 +134,16 @@ def animate_logo(logo: str, type: int):
         print(line + colors.default)
         time.sleep(0.01)
     time.sleep(1)
-    system('cls' if name == 'nt' else 'clear') #Clear the terminal
+    system('cls' if name == 'nt' else 'clear')  # Clear the terminal
 
-    #Sadly the "scroll back" animation doesn't work in most terminals
-    #for line in range(0,out.count("\n"),1):
+    # Sadly the "scroll back" animation doesn't work in most terminals
+    # for line in range(0,out.count("\n"),1):
     #    sys.stdout.write("\033[F")
     #    sys.stdout.write("\033[K")
     #    time.sleep(0.05)
 
-system('cls' if name == 'nt' else 'clear') #Clear the terminal
+
+system('cls' if name == 'nt' else 'clear')  # Clear the terminal
 animate_logo(boars, 0)
 time.sleep(1)
 animate_logo(wolves, 1)

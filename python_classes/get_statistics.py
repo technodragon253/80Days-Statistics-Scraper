@@ -4,27 +4,35 @@ from os import name, system
 import python_classes.data_types as data_types
 from python_classes.data_types import Payment, Sabotage
 
-#Short function for gammer stuff.
+# Short function for gammer stuff.
+
+
 def s(i):
     if i != 1:
         return "s"
     else:
         return ""
 
-#Short function for player name look ups.
+
+# Short function for player name look ups.
 player_lookup_table = {}
+
+
 def p(player_id):
     try:
         return player_lookup_table[player_id]
     except:
         return str(player_id)
 
-#Short function for team name look up.
+# Short function for team name look up.
+
+
 def t(team_id):
     try:
         return team_lookup_table[team_id]
     except:
         return team_id
+
 
 try:
     with open("output.json", "r") as f:
@@ -47,7 +55,7 @@ What statistic would you like to get?
 {colors.green}(Press '3' and 'Enter' for hall of fame){colors.default}
 {colors.green}(Press 'Enter' to exit){colors.default}
 """)
-#Get the player lookup table
+# Get the player lookup table
 for game in data:
     for team in game.teams:
         for player in team.players:
@@ -55,13 +63,13 @@ for game in data:
                 if player.name != "" or player.name != None:
                     player_lookup_table[player.id] = player.name
 
-#Further user prompting
+# Further user prompting
 if i == "1":
     i = input("""
 Enter the player id or name of the player you want to look up.
 """)
     system('cls' if name == 'nt' else 'clear')
-    #Find all the info we need from the data.
+    # Find all the info we need from the data.
     player_id = ""
     player_name = ""
     players_sabotages = []
@@ -74,34 +82,38 @@ Enter the player id or name of the player you want to look up.
     times_stallions = 0
     for game in data:
         for team in game.teams:
-            #Find player sabotages.
+            # Find player sabotages.
             for sabotage in team.sabotages:
-                if player_id != "": #If the player id has been found,
-                    if sabotage.player_id == player_id: #Check if the player were looking for is the player we're iterating over.
+                if player_id != "":  # If the player id has been found,
+                    # Check if the player were looking for is the player we're iterating over.
+                    if sabotage.player_id == player_id:
                         players_sabotages.append(sabotage)
                 elif sabotage.player_id == i:
                     players_sabotages.append(sabotage)
                     player_id = sabotage.player_id
                     player_name = p(sabotage.player_id)
-                elif p(sabotage.player_id).lower() == i.lower(): #If the name of a player was entered change 'i' to be the player id.
+                # If the name of a player was entered change 'i' to be the player id.
+                elif p(sabotage.player_id).lower() == i.lower():
                     players_sabotages.append(sabotage)
                     player_id = sabotage.player_id
                     player_name = p(sabotage.player_id)
-            #Find player payments.
+            # Find player payments.
             for payment in team.payments:
-                if player_id != "": #If the player id has been found,
-                    if payment.player_id == player_id: #Check if the player were looking for is the player we're iterating over.
+                if player_id != "":  # If the player id has been found,
+                    # Check if the player were looking for is the player we're iterating over.
+                    if payment.player_id == player_id:
                         players_payments.append(payment)
                 elif payment.player_id == i:
                     players_payments.append(payment)
                     player_id = payment.player_id
                     player_name = p(payment.player_id)
-                elif p(payment.player_id).lower() == i.lower(): #If the name of a player was entered change 'i' to be the player id.
+                # If the name of a player was entered change 'i' to be the player id.
+                elif p(payment.player_id).lower() == i.lower():
                     players_payments.append(payment)
                     player_id = payment.player_id
                     player_name = p(payment.player_id)
-                    
-            #Find the teams the player was on.
+
+            # Find the teams the player was on.
             for player in team.players:
                 if player_id != "":
                     if player.id == player_id:
@@ -146,17 +158,18 @@ Enter the player id or name of the player you want to look up.
         quit()
     win_rate = (total_wins / total_games) * 100
 
-    #Find payment stats.
+    # Find payment stats.
     total_payed = 0
     number_of_payments = 0
     max_payment = 0
-    min_payment = 1000000 #Need to set it to an obsured number so the min function works.
+    # Need to set it to an obsured number so the min function works.
+    min_payment = 1000000
     average_payment = 0
     payed_locations = {}
     most_payed_location = ""
     often_locations = {}
     most_often_location = ""
-    
+
     for payment in players_payments:
         number_of_payments += 1
         total_payed += payment.amount
@@ -165,26 +178,27 @@ Enter the player id or name of the player you want to look up.
         if payment.location in payed_locations:
             payed_locations[payment.location] += payment.amount
         else:
-            payed_locations[payment.location] =  payment.amount
+            payed_locations[payment.location] = payment.amount
         if payment.location in often_locations:
             often_locations[payment.location] += 1
         else:
-            often_locations[payment.location] =  1
+            often_locations[payment.location] = 1
     average_payment = int(total_payed / number_of_payments)
     most_payed_location = max(payed_locations, key=payed_locations.get)
     most_often_location = max(often_locations, key=often_locations.get)
 
-    #Find sabotage stats.
+    # Find sabotage stats.
     total_sabotaged = 0
     number_of_sabotages = 0
     max_sabotage = 0
-    min_sabotage = 100000 #Need to set it to an absurd number so the min function works.
+    # Need to set it to an absurd number so the min function works.
+    min_sabotage = 100000
     average_payment = 0
     sabotaged_locations = {}
     most_sabotaged_location = ""
     highest_locations = {}
     highest_sabotaged_location = ""
-    
+
     for sabotage in players_sabotages:
         number_of_sabotages += 1
         total_sabotaged += sabotage.amount
@@ -193,16 +207,18 @@ Enter the player id or name of the player you want to look up.
         if sabotage.location in highest_locations:
             highest_locations[sabotage.location] += sabotage.amount
         else:
-            highest_locations[sabotage.location] =  sabotage.amount
+            highest_locations[sabotage.location] = sabotage.amount
         if sabotage.location in sabotaged_locations:
             sabotaged_locations[sabotage.location] += 1
         else:
-            sabotaged_locations[sabotage.location] =  1
+            sabotaged_locations[sabotage.location] = 1
     average_payment = int(total_sabotaged / number_of_sabotages)
-    most_sabotaged_location = max(sabotaged_locations, key=sabotaged_locations.get)
-    highest_sabotaged_location = max(sabotaged_locations, key=sabotaged_locations.get)
+    most_sabotaged_location = max(
+        sabotaged_locations, key=sabotaged_locations.get)
+    highest_sabotaged_location = max(
+        sabotaged_locations, key=sabotaged_locations.get)
 
-    #Print way too many statistics!
+    # Print way too many statistics!
     print(f"""{colors.purple}
 Statistics for "{player_name}" with id of {player_id}:
 
@@ -251,7 +267,7 @@ elif i == "2":
 ################################################################
 
 elif i == "3":
-    #Get highest sabotage and payment
+    # Get highest sabotage and payment
     all_sabotages = []
     all_payments = []
     highest_payment = Payment(None, None, 0, None, None)
@@ -261,7 +277,8 @@ elif i == "3":
             for payment in team.payments:
                 player_in_list = False
                 for a_payment in all_payments:
-                    if a_payment.player_id == payment.player_id: #If we can find the player in already found payments, then increase the amount.
+                    # If we can find the player in already found payments, then increase the amount.
+                    if a_payment.player_id == payment.player_id:
                         player_in_list = True
                         index = all_payments.index(a_payment)
                         all_payments[index].amount += payment.amount
@@ -273,7 +290,8 @@ elif i == "3":
             for sabotage in team.sabotages:
                 player_in_list = False
                 for a_sabotage in all_sabotages:
-                    if a_sabotage.player_id == sabotage.player_id: #If we can find the player in already found sabotages, then increase the amount.
+                    # If we can find the player in already found sabotages, then increase the amount.
+                    if a_sabotage.player_id == sabotage.player_id:
                         player_in_list = True
                         index = all_sabotages.index(a_sabotage)
                         all_sabotages[index].amount += sabotage.amount
@@ -292,8 +310,8 @@ elif i == "3":
     for sabotage in all_sabotages:
         if max(highest_lifetime_sabotage.amount, sabotage.amount) == sabotage.amount:
             highest_lifetime_sabotage = sabotage
-    
-    #Get win stats.
+
+    # Get win stats.
     players_wins = {}
     most_winningest_player = {"id": None, "wins": 0}
     most_winningest_player_by_percentage = {"id": None, "win_rate": 0}
@@ -313,12 +331,12 @@ elif i == "3":
     for player in players_wins:
         if max(most_winningest_player["wins"], players_wins[player]["wins"]) == players_wins[player]["wins"]:
             most_winningest_player = players_wins[player]
-        player_win_rate = players_wins[player]["wins"] / players_wins[player]["games"]
+        player_win_rate = players_wins[player]["wins"] / \
+            players_wins[player]["games"]
         if players_wins[player]["wins"] >= 3:
             if max(most_winningest_player_by_percentage["win_rate"], player_win_rate) == player_win_rate:
                 most_winningest_player_by_percentage["id"] = players_wins[player]["id"]
                 most_winningest_player_by_percentage["win_rate"] = player_win_rate
-                
 
     print(f"""{colors.dark_green}
 Payment Hall of Fame:

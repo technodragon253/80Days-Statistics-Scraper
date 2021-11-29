@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import List
 
+
 @dataclass
 class Payment:
     time: datetime
@@ -9,9 +10,10 @@ class Payment:
     amount: int
     team: int
     location: str
-    
+
     def to_dict(self):
         return {"time": self.time.isoformat(), "player_id": self.player_id, "amount": self.amount, "team": self.team, "location": self.location}
+
     def copy(self):
         return Payment(self.time.isoformat(), self.player_id, self.amount, self.team, self.location)
 
@@ -23,9 +25,10 @@ class Sabotage:
     amount: int
     against: str
     location: str
-    
+
     def to_dict(self):
         return {"time": self.time.isoformat(), "player_id": self.player_id, "amount": self.amount, "against": self.against, "location": self.location}
+
     def copy(self):
         return Sabotage(self.time.isoformat(), self.player_id, self.amount, self.against, self.location)
 
@@ -49,7 +52,7 @@ class Player:
 @dataclass
 class Team:
     id: int
-    place: int #1 being first place, 2 being second, etc.
+    place: int  # 1 being first place, 2 being second, etc.
     players: List[Player]
     payments: List[Payment]
     sabotages: List[Sabotage]
@@ -80,24 +83,27 @@ class Game:
             teams.append(team.to_dict())
         return {"start_time": self.start_time.isoformat(), "end_time": self.end_time.isoformat(), "teams": teams}
 
+
 def from_json(json: dict) -> List[Game]:
     out = []
     for game in json:
-        g = Game(None, datetime.fromisoformat(game["start_time"]), datetime.fromisoformat(game["end_time"]), [])
+        g = Game(None, datetime.fromisoformat(
+            game["start_time"]), datetime.fromisoformat(game["end_time"]), [])
         for team in game["teams"]:
             t = Team(team["id"], team["place"], [], [], [])
             for player in team["players"]:
                 p = Player(player["id"], player["name"])
                 t.players.append(p)
             for payment in team["payments"]:
-                p = Payment(datetime.fromisoformat(payment["time"]), payment["player_id"], payment["amount"], payment["team"], payment["location"])
+                p = Payment(datetime.fromisoformat(
+                    payment["time"]), payment["player_id"], payment["amount"], payment["team"], payment["location"])
                 t.payments.append(p)
                 del(p)
             for sabotage in team["sabotages"]:
-                s = Sabotage(datetime.fromisoformat(sabotage["time"]), sabotage["player_id"], sabotage["amount"], sabotage["against"], sabotage["location"])
+                s = Sabotage(datetime.fromisoformat(
+                    sabotage["time"]), sabotage["player_id"], sabotage["amount"], sabotage["against"], sabotage["location"])
                 t.sabotages.append(s)
                 del(s)
             g.teams.append(t)
         out.append(g)
     return out
-

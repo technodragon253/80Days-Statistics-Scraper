@@ -1,4 +1,6 @@
+from python_classes.data_types import Channel
 from os import name
+
 
 class colors:
     if name == "nt":
@@ -19,7 +21,7 @@ class colors:
             cyan = colorama.Fore.LIGHTCYAN_EX
             gray = colorama.Fore.LIGHTBLACK_EX
             default = colorama.Fore.RESET
-        except: #If colorama isn't installed we'll run the rest of the program without color.
+        except:  # If colorama isn't installed we'll run the rest of the program without color.
             print("Colorama not installed. Running without colors.")
             dark_red = ""
             red = ""
@@ -35,7 +37,7 @@ class colors:
             cyan = ""
             gray = ""
             default = ""
-    else: #Because we're using ASCII art we need to have the colors almost perfectly synced to esure it looks the same on both devices.
+    else:  # Because we're using ASCII art we need to have the colors almost perfectly synced to esure it looks the same on both devices.
         dark_red = '\033[38;2;195;0;0m'
         red = '\033[38;2;205;66;66m'
         dark_green = '\033[38;2;16;132;14m'
@@ -50,7 +52,7 @@ class colors:
         cyan = '\033[38;2;60;245;240m'
         gray = '\033[38;2;96;96;96m'
         default = '\033[0m'
-    print(default, end="") #Make sure we're using the default color settings.
+    print(default, end="")  # Make sure we're using the default color settings.
 
     def test_colors():
         print(colors.dark_red + "dark red" + colors.default)
@@ -68,19 +70,26 @@ class colors:
         print(colors.gray + "gray" + colors.default)
         print(colors.default + "default" + colors.default)
 
-from python_classes.data_types import Channel
 
 server_id = "614335416178442242"
-progress_anouncements = Channel("614336214786375682", "Progress Anouncements", "Anouncements")
+progress_anouncements = Channel(
+    "614336214786375682", "Progress Anouncements", "Anouncements")
 boars_general = Channel("614345791133188096", "Boars General", "Argent Boars")
-boars_commands = Channel("614350341344985098", "Boars Commands", "Argent Boars")
-wolves_general = Channel("614345822477352974", "Wolves General", "Azure Wolves")
-wolves_commands = Channel("614350640264511508", "Wolves Commands", "Azure Wolves")
-stallions_general = Channel("614345873463443457", "Stallions General", "Crimson Stallions")
-stallions_commands = Channel("614503418299547661", "Stallions Commands", "Crimson Stallions")
-all_player_channels = {1:[boars_general, boars_commands], 2:[wolves_general, wolves_commands], 3:[stallions_general, stallions_commands]}
+boars_commands = Channel("614350341344985098",
+                         "Boars Commands", "Argent Boars")
+wolves_general = Channel("614345822477352974",
+                         "Wolves General", "Azure Wolves")
+wolves_commands = Channel("614350640264511508",
+                          "Wolves Commands", "Azure Wolves")
+stallions_general = Channel(
+    "614345873463443457", "Stallions General", "Crimson Stallions")
+stallions_commands = Channel(
+    "614503418299547661", "Stallions Commands", "Crimson Stallions")
+all_player_channels = {1: [boars_general, boars_commands], 2: [
+    wolves_general, wolves_commands], 3: [stallions_general, stallions_commands]}
 
-team_lookup_table = {1:"Argent Boars", 2:"Azure Wolves", 3: "Crimson Stallions"}
+team_lookup_table = {1: "Argent Boars",
+                     2: "Azure Wolves", 3: "Crimson Stallions"}
 
 discord_epoch = 1420070400000
 

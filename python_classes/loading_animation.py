@@ -2,10 +2,13 @@ import time
 import threading
 import sys
 
+
 class loading_animation():
     animation = 0
+
     def __init__(self):
         self.loading = True
+
     def loading_animation(self):
         if self.animation == 0:
             print("-\r", end="")
@@ -71,6 +74,7 @@ class loading_animation():
         self.thread.daemon = True
         self.thread.start()
         time.sleep(0.1)
+
     def stop(self):
         self.loading = False
         print("\r", end="")
